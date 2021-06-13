@@ -293,8 +293,12 @@ FragColor = vec4(texture(skybox, R).rgb, 1.0);
    问题，那当然是一直伴随着这个项目。最起初我也是想用webgl做的，毕竟现成的代码那么多，又花费时间把webgl编程指南通读一遍，细读了重点和代码。但是感觉还是不是很适应，光是shader的运行时编译链接成program教材就有几个版本不同的封装，矩阵库也是不如自己写每个统一，js真心不熟，看看glm多好用。到最后还得面临纹理浏览器安全性问题，虽然服务器很好搭建但不如stb_image方便，但总之半路出家变成opengl和cpp一下子舍弃了很多，但是learn opengl上的教程帮助了我很多。起初搭建环境，cmake glfw和assimp等就浪费了不少时间。不过最后导出为vs配置文件.props,类似xml之后陪环境就是几秒钟的事了，模型导入也是一个坑点，好在有参考。之后gui用上imgui那也是有些迷惑，没有文档和资料，好在源码不是很复杂。回顾之后很多麻烦的糟心事果然还是出在api上，太多了！！！查文档帮助了我很多，谢谢youtube上cherno的教程，看完之后入门舒服多了。也谢谢万琳老师的mooc教程，陈蓉老师上课的讲授，还有助教肖晓及时回复与帮助。
 
 #### 参考文献
-[1] learnopengl-cn.github.io/
-[2] www.youtube.com/watch?v=W3gAzLwfIP0&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2
-[3] http://docs.gl/
-[4] https://www.icourse163.org/learn/HUST-1003636001?tid=1457257442#/learn/announce
+
+                      [1] learnopengl-cn.github.io/
+
+                      [2] www.youtube.com/watch?v=W3gAzLwfIP0&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2
+
+                      [3] http://docs.gl/
+
+                      [4] https://www.icourse163.org/learn/HUST-1003636001?tid=1457257442#/learn/announce
     

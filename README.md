@@ -23,4 +23,59 @@
 当然背包模型凹凸不平。每个fragment都是用自己的不同的法线，这样就可以根据表面细微的细节对法线向量进行改变，这样就会获得一种表面看起来要复杂得多的幻觉。但是模型法线贴图里面的所有法线向量都是指向正z方向的。而模型可不全是，因此引入切线空间（tangent space）。在一个不同的坐标空间中进行光照，这个坐标空间里，法线贴图向量总是指向这个坐标空间的正z方向；所有的光照向量都相对与这个正z方向进行变换。这样我们就能始终使用同样的法线贴图，不管朝向问题。
 此外，本项目还使用了将多个纹理组合起来映射到一张纹理上的立方体贴图(Cube Map)。将整个环境映射到了一个纹理对象，利用这个信息得到天空盒。通过使用环境的立方体贴图，及用环境映射(Environment Mapping)实现反射(Reflection)效果，得到像是镜子一样的立方体。周围的天空盒被完美地反射在立方体上。
 
+### 2 项目设计
+#### 2.1 场景物体模型设计
+对于场景中的立方体和光源直接手工定义所有的顶点、法线
+
+为了解析模型文件以及提取所有有用的信息，将它们储存为OpenGL能够理解的格式。采用一个非常流行的模型导入库是Assimp，当使用Assimp导入一个模型的时候，它通常会将整个模型加载进一个场景(Scene)对象，它会包含导入的模型/场景中的所有数据。Assimp会将场景载入为一系列的节点(Node)，每个节点包含了场景对象中所储存数据的索引，每个节点都可以有任意数量的子节点。
+
+通过使用Assimp加载模型到程序中，但是载入后它们都被储存为Assimp的数据结构。最终仍要将这些数据转换为OpenGL能够理解的格式。网格(Mesh)代表的是单个的可绘制实体，一个网格应该至少需要一系列的顶点，每个顶点包含一个位置向量、一个法向量和一个纹理坐标向量。一个网格还应该包含用于索引绘制的索引以及纹理形式的材质数据（漫反射/镜面光贴图）。
+Model和Mesh类来加载并使用刚刚介绍的结构储存导入后的模型。如果想要绘制一个模型，不需要将整个模型渲染为一个整体，只需要渲染组成模型的每个独立的网格就可以了。
+
+定义网格类的结构：
+
+```cpp
+class Mesh {
+    public:
+        /*  网格数据  */
+        vector<Vertex> vertices;
+        vector<unsigned int> indices;
+        vector<Texture> textures;
+        /*  函数  */
+        Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
+        void Draw(Shader shader);
+    private:
+        /*  渲染数据  */
+        unsigned int VAO, VBO, EBO;
+        /*  函数  */
+        void setupMesh();
+};  
+```
+  在构造器中，将所有必须的数据赋予了网格，在setupMesh函数中初始化缓冲，并最终使用Draw函数来绘制网格。
+
+  Model类包含了一个Mesh对象的vector<Mesh>。在构造器中，它会直接通过loadModel来加载文件。私有函数将会处理Assimp导入过程中的一部分。储存文件路径的目录，加载纹理的时候还会用到。Draw函数遍历了所有网格，并调用它们各自的Draw函数。
+  
+```cpp
+  class Model 
+{
+    public:
+        /*  函数   */
+        Model(char *path)
+        {
+            loadModel(path);
+        }
+        void Draw(Shader shader);   
+    private:
+        /*  模型数据  */
+        vector<Mesh> meshes;
+        string directory;
+        /*  函数   */
+        void loadModel(string path);
+        void processNode(aiNode *node, const aiScene *scene);
+        Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+        vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, 
+                                             string typeName);
+};
+```
+
 
